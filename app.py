@@ -35,14 +35,14 @@ logo_unb = Image.open(caminho_imagem)
 # Título e Logos
 col1, col2, col3 = st.columns([1, 6, 1])
 with col1:
-    st.image(logo_unb, use_column_width=True)
+    st.image(logo_unb, use_container_width=True)
 with col2:
     st.markdown("<h1 style='text-align: center; color: #003366;'>Análise de Distribuições de Probabilidade</h1>", 
                 unsafe_allow_html=True)
     st.markdown("<h3 style='text-align: center; color: #003366;'>Professor João Gabriel de Moraes Souza</h3>", 
                 unsafe_allow_html=True)  # Inserir nome do professor
 with col3:
-    st.image(logo_unb, use_column_width=True)
+    st.image(logo_unb, use_container_width=True)
 
 st.markdown("---")
 
