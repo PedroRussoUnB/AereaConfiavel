@@ -1,12 +1,12 @@
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
-import plotly.express as px
+import pandas as pd
 from scipy.stats import binom
 from scipy.stats import norm
-import pandas as pd
+import plotly.express as px
 from PIL import Image
-import subprocess
+import os
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -15,262 +15,130 @@ st.set_page_config(page_title="Análise de Distribuições de Probabilidade",
                    layout="wide",
                    initial_sidebar_state="expanded")
 
-# Slider CSS customization for green color
-st.markdown(
-    """
+# Estilo verde do slider
+st.markdown("""
     <style>
     .stSlider > div > div > div > div > div > div {
-        background-color: #4CAF50 !important;  /* Verde para o slider */
+        background-color: #4CAF50 !important;
     }
     </style>
-    """,
-    unsafe_allow_html=True,
-)
+    """, unsafe_allow_html=True)
 
-# Carregar as logos
-import os
+# Carregar logotipo
 caminho_imagem = os.path.join(os.path.dirname(__file__), "Logo", "unb_logo.png")
 logo_unb = Image.open(caminho_imagem)
 
-# Título e Logos
+# Cabeçalho com logotipo e título
 col1, col2, col3 = st.columns([1, 6, 1])
 with col1:
     st.image(logo_unb, use_container_width=True)
 with col2:
-    st.markdown("<h1 style='text-align: center; color: #003366;'>Análise de Distribuições de Probabilidade</h1>", 
-                unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align: center; color: #003366;'>Professor João Gabriel de Moraes Souza</h3>", 
-                unsafe_allow_html=True)  # Inserir nome do professor
+    st.markdown("<h1 style='text-align: center; color: #003366;'>Análise de Distribuições de Probabilidade</h1>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; color: #003366;'>Professor João Gabriel de Moraes Souza</h3>", unsafe_allow_html=True)
 with col3:
     st.image(logo_unb, use_container_width=True)
 
 st.markdown("---")
 
-# Criação de abas para diferentes distribuições
-tab1, tab2, tab3, tab4 = st.tabs(["Distribuição Binomial", "Distribuição Poisson", "Distribuição Normal", "Simulação de ROI em um Call Center"])
+# Abas
+aba1, aba2, aba3 = st.tabs(["Overbooking", "Simulação de ROI", "Decisão e Análise Final"])
 
-# Aba da Distribuição Binomial
-with tab1:
-    st.header("Distribuição Binomial")
-    st.markdown("### Simulação de Overbooking")
+# ------------------------------- ABA 1 - OVERBOOKING ------------------------------
+with aba1:
+    st.header("Simulação de Overbooking (Binomial)")
 
-    # Títulos dos sliders em azul
-    st.markdown("<h4 style='color: #003366;'>Probabilidade de Comparecimento (p)</h4>", unsafe_allow_html=True)
-    p = st.slider("", min_value=0.8, max_value=1.00, value=0.88, step=0.01)  
-    st.markdown("<h4 style='color: #003366;'>Número de Assentos Vendidos</h4>", unsafe_allow_html=True)
-    seats_sold = st.slider("", min_value=451, max_value=500, value=461, step=1)
+    st.markdown("#### Cálculo de Risco de Overbooking com Cenários Personalizáveis")
 
-    st.markdown("<h4 style='color: #003366;'>Nível de Risco Aceito (%)</h4>", unsafe_allow_html=True)
-    risk_level = st.slider("", min_value=0.01, max_value=0.50, value=0.05, step=0.01) 
-    
-    # Calcular probabilidade
-    probability = 1 - binom.cdf(450, seats_sold, p)
+    capacidade = st.number_input("Capacidade do avião (número de assentos)", min_value=100, max_value=200, value=120)
+    assentos_vendidos = st.slider("Número de passagens vendidas", min_value=capacidade, max_value=capacidade + 30, value=130)
+    p = st.slider("Probabilidade de comparecimento (p)", min_value=0.80, max_value=1.00, value=0.88, step=0.01)
 
-    # Gráfico dinâmico usando Plotly
+    risco = 1 - binom.cdf(capacidade, assentos_vendidos, p)
+    st.write(f"### Probabilidade de mais de {capacidade} passageiros aparecerem: **{risco*100:.2f}%**")
+
+    # Gráfico da probabilidade em função de passagens vendidas
+    st.markdown("#### Variação da Probabilidade de Overbooking com Diferentes Quantidades Vendidas")
+    venda_range = np.arange(capacidade, capacidade + 21)
+    probs = 1 - binom.cdf(capacidade, venda_range, p)
+
     fig = go.Figure()
-
-    fig.add_trace(go.Scatter(x=np.arange(451, seats_sold + 1), 
-                             y=1 - binom.cdf(450, np.arange(451, seats_sold + 1), p),
-                             mode='lines', line=dict(color='#003366', width=3)))
-
-    fig.add_hline(y=risk_level, line_dash="dash", line_color="red", line_width=1)  # Dinamicamente ajustado
-
-    fig.update_layout(title="Risco de Overbooking para mais de 450 passageiros",
-                      xaxis_title="Assentos Vendidos",
-                      yaxis_title="Probabilidade de mais de 450 passageiros aparecerem",
-                      xaxis=dict(tickmode='linear', tick0=451, dtick=1),
+    fig.add_trace(go.Scatter(x=venda_range, y=probs, mode='lines+markers', line=dict(color='#003366')))
+    fig.update_layout(title="Probabilidade de Overbooking (mais passageiros que assentos)",
+                      xaxis_title="Número de Passagens Vendidas",
+                      yaxis_title="Probabilidade (%)",
                       yaxis=dict(range=[0, 1]),
-                      plot_bgcolor="white",
-                      width=800,
-                      height=400)
-
+                      plot_bgcolor="white")
     st.plotly_chart(fig, use_container_width=True)
 
-    # Gerar tabela de dados com base nos valores selecionados
-    seats_sold_range = np.arange(451, seats_sold + 1)
-    probabilities = (1 - binom.cdf(450, seats_sold_range, p)) 
-    table = pd.DataFrame({'Assentos Vendidos a mais': seats_sold_range, 'Risco de Overbooking (%)': probabilities})
+    tabela = pd.DataFrame({"Passagens Vendidas": venda_range, "Risco de Overbooking (%)": (probs * 100).round(2)})
+    st.write("### Tabela de Riscos por Quantidade de Vendas")
+    st.dataframe(tabela)
 
-    # Exibir a tabela filtrada no Streamlit
-    st.write("### Tabela de Probabilidades para Assentos Vendidos Selecionados")
-    st.dataframe(table)  # Exibir a tabela filtrada
-
-    # Determinar o número máximo de assentos vendidos até atingir o nível de risco aceito
-    max_seats_within_risk = table[table['Risco de Overbooking (%)'] <= risk_level]['Assentos Vendidos a mais'].max()
-    if pd.notna(max_seats_within_risk):
-        st.write(f"O número máximo de assentos que podem ser vendidos sem exceder o nível de risco aceito ({round(risk_level, 2)*100}%) é de {int(max_seats_within_risk)} assentos.")
+    limite_risco = tabela[tabela['Risco de Overbooking (%)'] <= 7]['Passagens Vendidas'].max()
+    if pd.notna(limite_risco):
+        st.success(f"Número máximo de passagens a serem vendidas com risco ≤ 7%: {limite_risco}")
     else:
-        st.write(f"Nenhum número de assentos vendidos está abaixo do nível de risco aceito ({round(risk_level, 2)*100}%).")
+        st.error("Nenhuma configuração está abaixo do risco de 7%.")
 
-# Aba da Distribuição Poisson (vazia por enquanto)
-with tab2:
-    st.header("Distribuição Poisson")
-    st.markdown("### Simulação de Número de clientes que chegam em uma loja por dia")
-    
-    # Entrada do usuário
-    st.markdown("<h4 style='color: #003366;'>Taxa média de chegada de clientes (λ)</h4>", unsafe_allow_html=True)
-    lambda_value = st.slider(" ", min_value=1, max_value=20, value=5, step=1)
-    st.markdown("<h4 style='color: #003366;'>Número de horas simuladas</h4>", unsafe_allow_html=True)
-    num_hours = st.slider(" ", min_value=1, max_value=48, value=24, step=1)
-    st.markdown("<h4 style='color: #003366;'>Número de simulações Monte Carlo</h4>", unsafe_allow_html=True)
-    num_simulations = st.slider(" ", min_value=100, max_value=10000, value=1000, step=100)
+    # Análise Financeira
+    st.markdown("#### Avaliação Financeira de Vender 10 a Mais que a Capacidade")
+    custo_indenizacao = st.number_input("Custo médio por passageiro em overbooking (R$)", min_value=0, value=1000)
+    receita_passagem = st.number_input("Receita por passagem extra vendida (R$)", min_value=0, value=500)
 
-    # Simulação Monte Carlo
-    np.random.seed(42)  # Para reprodutibilidade
-    simulated_data = np.random.poisson(lam=lambda_value, size=(num_simulations, num_hours))
+    risco_10 = 1 - binom.cdf(capacidade, capacidade + 10, p)
+    ganho_extra = receita_passagem * 10
+    perda_esperada = risco_10 * custo_indenizacao
+    st.write(f"- Receita extra esperada: **R$ {ganho_extra:.2f}**")
+    st.write(f"- Custo esperado com overbooking: **R$ {perda_esperada:.2f}**")
 
-    # Calcular a média de clientes por hora em todas as simulações
-    average_customers_per_hour = np.round(np.mean(simulated_data, axis=0), 2)
+    if ganho_extra > perda_esperada:
+        st.success("Compensa financeiramente vender 10 passagens a mais.")
+    else:
+        st.warning("Não compensa financeiramente vender 10 a mais — o risco é maior que o ganho.")
 
-    # Preparar dados para o Plotly Express
-    hourly_data = {
-        'Hora do Dia': np.arange(1, num_hours + 1),
-        'Número Médio de Clientes': average_customers_per_hour
-    }
-    df = pd.DataFrame(hourly_data)
+# -------------------------- ABA 2 - ROI DO NOVO SISTEMA --------------------------
+with aba2:
+    st.header("Análise de ROI do Novo Sistema de Previsão de Demanda")
 
-    # Gráfico interativo usando Plotly Express
-    fig = px.line(df, 
-              x='Hora do Dia', 
-              y='Número Médio de Clientes', 
-              title=(f"Simulação Monte Carlo: Chegada de Clientes por Hora \n"
-                     f"(λ = {lambda_value}, {num_hours} horas, {num_simulations} simulações)"),
-              labels={'Hora do Dia': 'Hora do Dia', 'Número Médio de Clientes': 'Número Médio de Clientes'},
-              markers=True)
+    investimento = st.slider("Investimento inicial (R$)", min_value=10000, max_value=100000, value=50000, step=1000)
+    receita_estimada = st.slider("Receita estimada com o novo sistema (R$)", min_value=40000, max_value=100000, value=80000, step=1000)
+    custo_operacional = st.slider("Custo operacional anual (R$)", min_value=0, max_value=50000, value=10000, step=1000)
 
-    # Mostrar gráfico no Streamlit
+    lucro = receita_estimada - custo_operacional
+    roi = (lucro / investimento) * 100
+    st.write(f"### ROI Esperado: **{roi:.2f}%**")
+
+    # Simulação Monte Carlo para variação da receita
+    st.markdown("#### Simulação de Cenários com Receita Variável")
+    media = receita_estimada
+    desvio = st.slider("Desvio padrão da receita simulada", min_value=1000, max_value=30000, value=10000, step=1000)
+    simulacoes = st.slider("Número de simulações Monte Carlo", min_value=100, max_value=10000, value=1000, step=100)
+
+    receitas_simuladas = np.random.normal(loc=media, scale=desvio, size=simulacoes)
+    lucros_simulados = receitas_simuladas - custo_operacional
+    rois_simulados = (lucros_simulados / investimento) * 100
+
+    prob_receita_baixa = (receitas_simuladas < 60000).mean() * 100
+    st.write(f"Probabilidade da receita ficar abaixo de R$ 60.000: **{prob_receita_baixa:.2f}%**")
+
+    fig = px.histogram(rois_simulados, nbins=30, title="Distribuição do ROI Simulado", labels={"value": "ROI (%)"})
     st.plotly_chart(fig, use_container_width=True)
 
-    # Criar um DataFrame para os resultados com labels
-    hourly_results = pd.DataFrame({
-        'Hora do Dia': [f"Hora {i+1}" for i in range(min(24, num_hours))],
-        'Número Médio de Clientes': average_customers_per_hour[:min(24, num_hours)]
-    })
-    st.write("### Tabela de Quantidade de Clientes Estimada por Dia")
-    st.table(hourly_results)
+    st.write("#### ROI em 3 cenários")
+    st.write(f"- Otimista (percentil 90): {np.percentile(rois_simulados, 90):.2f}%")
+    st.write(f"- Realista (média): {np.mean(rois_simulados):.2f}%")
+    st.write(f"- Pessimista (percentil 10): {np.percentile(rois_simulados, 10):.2f}%")
 
-# Aba da Distribuição Normal (vazia por enquanto)
-with tab3:
-    st.header("Distribuição Normal")
-    st.markdown("### Simulação de Número de Caixas Vendidas de Medicamentos")
-        # Função para calcular a área entre lb e ub
-    def calcular_area(mean, sd, lb, ub):
-        area = norm.cdf(ub, mean, sd) - norm.cdf(lb, mean, sd)
-        return area
-
-    # Parâmetros ajustáveis
-    mean = st.slider("Média (mean)", 50, 150, 100)
-    sd = st.slider("Desvio Padrão (sd)", 5, 30, 15)
-    lb = st.slider("Limite Inferior (lb)", 50, 100, 80)
-    ub = st.slider("Limite Superior (ub)", 100, 150, 120)
-
-    # Cálculo da probabilidade
-    area = calcular_area(mean, sd, lb, ub)
-    result = round(area * 100, 2)
-
-    # Mensagem do resultado
-    st.write(f"P({lb} <= Nº Caixas <= {ub}) = {result}%")
-
-    # Gerar os dados para a distribuição normal
-    x = np.linspace(40, 160, 500)
-    hx = norm.pdf(x, mean, sd)
-
-    # Gráfico com Plotly
-    fig = go.Figure()
-
-    # Adiciona a curva da distribuição normal
-    fig.add_trace(go.Scatter(
-        x=x, y=hx,
-        mode='lines',
-        name='Distribuição Normal',
-        line=dict(color='black')
-    ))
-
-    # Preencher a área entre os limites inferior e superior
-    x_fill = np.linspace(lb, ub, 100)
-    hx_fill = norm.pdf(x_fill, mean, sd)
-
-    fig.add_trace(go.Scatter(
-        x=np.concatenate([x_fill, x_fill[::-1]]),
-        y=np.concatenate([hx_fill, np.zeros_like(hx_fill)]),
-        fill='toself',
-        fillcolor='rgba(255, 0, 0, 0.5)',
-        line=dict(color='red'),
-        hoverinfo='skip',
-        name='Área'
-    ))
-
-    # Customizar o layout do gráfico
-    fig.update_layout(
-        title=f"Distribuição Normal com média={mean} e desvio padrão={sd}",
-        xaxis_title="Número de Caixas",
-        yaxis_title="Densidade",
-        xaxis=dict(range=[40, 160]),
-        yaxis=dict(range=[0, 0.03]),
-        showlegend=False
-    )
-
-    # Exibir o gráfico no Streamlit
-    st.plotly_chart(fig)
-
-# Aba: Simulação de ROI - Call Center
-with tab4:
-    st.header("Simulação Interativa de ROI no Call Center")
+# -------------------------- ABA 3 - DECISÃO FINAL --------------------------
+with aba3:
+    st.header("Decisão Estratégica Final")
 
     st.markdown("""
-    Imagine que, como cientista de dados de uma grande firma de *Call Center*, a gestão solicitou sua ajuda para melhorar o **ROI** (Retorno sobre o Investimento). Os empregados dessa firma têm como objetivo conseguir **angariar novos clientes** e **manter os clientes antigos fidelizados**.
+    Com base nos resultados da aba de Overbooking e da análise de ROI:
+    - Se o ganho financeiro supera os custos esperados com overbooking, a estratégia de vender mais passagens pode ser adotada com cautela.
+    - A adoção do novo sistema de previsão traz um ROI esperado considerável, mas com incerteza ligada à receita real. A simulação ajuda a visualizar esses riscos.
 
-    **Dados do cenário base:**
-    - Cada empregado realiza em média **50 chamadas por dia**;
-    - A **probabilidade de sucesso** em cada chamada é de **4%**;
-    - Cada conversão gera uma **receita média de R$ 100,00**;
-    - A firma de *Call Center* possui **100 empregados**;
-    - Cada empregado recebe **R$ 200,00** por dia de trabalho.
+    ✅ **Recomenda-se adoção do sistema com acompanhamento inicial e ajustes conforme performance.**
 
-    Abaixo, você pode ajustar os parâmetros para simular diferentes cenários e observar o impacto no lucro da operação do Call Center.
+    💡 Caso o ROI real fique abaixo de 0%, a empresa deve revisar sua estratégia ou renegociar custos operacionais.
     """)
-
-    # Sliders interativos
-    n = st.slider("Número de chamadas por empregado por dia", min_value=10, max_value=100, value=50, step=5)
-    p = st.slider("Probabilidade de sucesso por chamada (%)", min_value=1, max_value=10, value=4, step=1) / 100
-    revenue = st.slider("Receita por chamada bem-sucedida (R$)", min_value=50, max_value=500, value=100, step=10)
-    wage = st.slider("Custo por empregado por dia (R$)", min_value=100, max_value=400, value=200, step=10)
-    employees = st.slider("Número de empregados", min_value=10, max_value=500, value=100, step=10)
-    sims = st.slider("Número de simulações Monte Carlo", min_value=100, max_value=5000, value=1000, step=100)
-
-    # Simulação Monte Carlo
-    sim_conversions = [np.sum(np.random.binomial(n, p, size=employees)) for _ in range(sims)]
-    sim_profits = np.array(sim_conversions) * revenue - employees * wage
-
-    # Gráfico interativo com Plotly
-    fig = go.Figure()
-    fig.add_trace(go.Histogram(
-        x=sim_profits,
-        nbinsx=30,
-        name='Distribuição de Lucros',
-        marker_color='blue',
-        opacity=0.75
-    ))
-
-    fig.update_layout(
-        title="Distribuição Simulada de Lucros Diários do Call Center",
-        xaxis_title="Lucro Diário (R$)",
-        yaxis_title="Frequência",
-        plot_bgcolor="white",
-        bargap=0.05
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
-
-    # Estatísticas Resumidas
-    lucro_medio = np.mean(sim_profits)
-    lucro_std = np.std(sim_profits)
-    lucro_min = np.min(sim_profits)
-    lucro_max = np.max(sim_profits)
-
-    st.markdown("### Estatísticas Resumidas do Lucro")
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Lucro Médio", f"R$ {lucro_medio:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-    col2.metric("Desvio-Padrão", f"R$ {lucro_std:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-    col3.metric("Lucro Mínimo", f"R$ {lucro_min:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-    col4.metric("Lucro Máximo", f"R$ {lucro_max:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
