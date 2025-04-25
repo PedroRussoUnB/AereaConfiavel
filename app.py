@@ -103,6 +103,7 @@ with aba1:
     else:
         st.warning("Não compensa financeiramente — o risco é maior que o ganho.")
 
+
 # -------------------------- ABA 2 - ROI DO NOVO SISTEMA --------------------------
 with aba2:
     st.header("Análise de ROI do Novo Sistema de Previsão de Demanda")
@@ -113,6 +114,8 @@ with aba2:
 
     lucro = receita_estimada - custo_operacional
     roi = (lucro / investimento) * 100
+    st.session_state["roi_percent"] = roi  # Salva o ROI para ser acessado na aba 3
+
     st.write(f"### ROI Esperado: **{roi:.2f}%**")
 
     st.markdown("#### Simulação de Cenários com Receita Variável")
