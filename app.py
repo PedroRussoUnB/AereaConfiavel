@@ -140,24 +140,45 @@ with aba2:
 with aba3:
     st.header("Decisão Estratégica Final")
 
-    st.markdown("""
-    ### 📊 Análise Integrada e Recomendação Estratégica
-
-    Com base nos dados simulados:
-    - A **probabilidade de overbooking** pode ser controlada ajustando o número de passagens vendidas, conforme o risco máximo definido.
-    - A **simulação de ROI** mostra que o investimento pode ser vantajoso, especialmente se a receita estimada for atingida ou superada.
-
-    ### 🔍 Recomendação
-    ✅ **Recomenda-se a adoção do novo sistema com acompanhamento inicial.**
+    st.markdown("### 📌 Avaliação Personalizada da Decisão")
     
-    Entretanto, ajustes estratégicos podem ser úteis:
-    - **Reduzir custos operacionais** ou buscar **subsídios de tecnologia**.
-    - **Melhorar a modelagem da demanda** usando dados históricos mais precisos.
-    - **Avaliar políticas flexíveis de remarcação e indenização** para mitigar impactos do overbooking.
+    st.markdown("Abaixo, ajuste suas expectativas e veja se o projeto atende ao retorno esperado:")
 
-    ### 💡 Evolução do sistema de informação
-    - Pode incorporar **inteligência artificial para previsão de demanda**.
-    - Pode conectar-se com sistemas externos (clima, eventos) para melhorar a previsão de comparecimento.
+    # Expectativa de ROI mínima que o usuário considera aceitável
+    roi_min_aceitavel = st.slider("Qual o ROI (%) mínimo que você considera aceitável para investir nesse sistema?", 0, 100, 30, step=5)
 
-    > **Resumo**: O sistema tem alto potencial de retorno, mas exige gestão ativa dos riscos de overbooking e da incerteza nas receitas.
+    # Nível de tolerância ao risco
+    risco_tolerado = st.radio("Qual seu nível de tolerância ao risco?", ["Baixo", "Moderado", "Alto"])
+
+    # Comentários técnicos e financeiros automáticos
+    st.markdown("---")
+    st.subheader("📈 Análise Técnica e Financeira")
+
+    st.markdown(f"**ROI calculado com os dados fornecidos:** `{roi_percent:.2f}%`")
+
+    if roi_percent >= roi_min_aceitavel:
+        st.success("✅ O ROI calculado é superior ao mínimo esperado.")
+        if risco_tolerado == "Baixo":
+            st.info("Como você é mais cauteloso, recomenda-se acompanhar de perto os primeiros meses de operação.")
+        elif risco_tolerado == "Moderado":
+            st.info("Com bom retorno e risco aceitável, a implementação é viável com um plano de contingência.")
+        else:
+            st.info("Seu perfil aceita riscos maiores, e o ROI está ótimo. Vale a pena implementar com velocidade.")
+    else:
+        st.error("⚠️ O ROI calculado está abaixo do que você espera.")
+        if risco_tolerado == "Baixo":
+            st.warning("Você tem baixa tolerância ao risco. Adiar ou renegociar o investimento pode ser prudente.")
+        elif risco_tolerado == "Moderado":
+            st.warning("Considere ajustar os custos operacionais ou rever a meta de receita.")
+        else:
+            st.warning("Apesar do ROI abaixo, você aceita riscos. Pode valer a pena, mas com estratégia de controle de danos.")
+
+    st.markdown("---")
+    st.subheader("💡 Recomendações Técnicas Finais")
+
+    st.markdown("""
+    - Automatizar o monitoramento dos dados em tempo real para ajustar as vendas.
+    - Investir em modelos preditivos baseados em **inteligência artificial** para refinar a previsão de demanda.
+    - Buscar **subsídios ou parcerias** que ajudem a reduzir os custos operacionais.
+    - Reavaliar anualmente a performance do sistema e seu ROI real.
     """)
