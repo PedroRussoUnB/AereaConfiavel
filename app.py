@@ -140,45 +140,47 @@ with aba2:
 with aba3:
     st.header("Decisão Estratégica Final")
 
-    st.markdown("### 📌 Avaliação Personalizada da Decisão")
-    
-    st.markdown("Abaixo, ajuste suas expectativas e veja se o projeto atende ao retorno esperado:")
+    # Recuperar ROI salvo da aba anterior
+    roi_percent = st.session_state.get("roi_percent", None)
 
-    # Expectativa de ROI mínima que o usuário considera aceitável
-    roi_min_aceitavel = st.slider("Qual o ROI (%) mínimo que você considera aceitável para investir nesse sistema?", 0, 100, 30, step=5)
-
-    # Nível de tolerância ao risco
-    risco_tolerado = st.radio("Qual seu nível de tolerância ao risco?", ["Baixo", "Moderado", "Alto"])
-
-    # Comentários técnicos e financeiros automáticos
-    st.markdown("---")
-    st.subheader("📈 Análise Técnica e Financeira")
-
-    st.markdown(f"**ROI calculado com os dados fornecidos:** `{roi_percent:.2f}%`")
-
-    if roi_percent >= roi_min_aceitavel:
-        st.success("✅ O ROI calculado é superior ao mínimo esperado.")
-        if risco_tolerado == "Baixo":
-            st.info("Como você é mais cauteloso, recomenda-se acompanhar de perto os primeiros meses de operação.")
-        elif risco_tolerado == "Moderado":
-            st.info("Com bom retorno e risco aceitável, a implementação é viável com um plano de contingência.")
-        else:
-            st.info("Seu perfil aceita riscos maiores, e o ROI está ótimo. Vale a pena implementar com velocidade.")
+    if roi_percent is None:
+        st.warning("⚠️ O ROI ainda não foi calculado. Volte para a aba anterior, forneça os dados e clique em Simular ROI.")
     else:
-        st.error("⚠️ O ROI calculado está abaixo do que você espera.")
-        if risco_tolerado == "Baixo":
-            st.warning("Você tem baixa tolerância ao risco. Adiar ou renegociar o investimento pode ser prudente.")
-        elif risco_tolerado == "Moderado":
-            st.warning("Considere ajustar os custos operacionais ou rever a meta de receita.")
+        st.success(f"✅ ROI calculado com os dados fornecidos: **{roi_percent:.2f}%**")
+
+        st.markdown("---")
+        st.subheader("📌 Análise Estratégica Interativa")
+
+        st.markdown("Com base no ROI atual, você pode ajustar as variáveis abaixo para simular diferentes estratégias:")
+
+        # Ajustes estratégicos
+        nova_receita = st.slider("Nova Receita Esperada (R$)", min_value=40000, max_value=120000, value=80000, step=5000)
+        novo_custo_operacional = st.slider("Novo Custo Operacional (R$)", min_value=0, max_value=30000, value=10000, step=1000)
+        novo_custo_investimento = st.slider("Novo Custo de Investimento (R$)", min_value=30000, max_value=70000, value=50000, step=5000)
+
+        lucro = nova_receita - novo_custo_operacional
+        novo_roi = (lucro / novo_custo_investimento) * 100
+
+        st.markdown(f"💰 **Novo ROI Simulado:** `{novo_roi:.2f}%`")
+
+        st.markdown("---")
+        st.subheader("📈 Recomendação Baseada no Novo ROI")
+
+        if novo_roi > 50:
+            st.success("🚀 Excelente ROI! A recomendação é **adotar imediatamente o sistema**, com grande chance de retorno financeiro.")
+        elif 20 <= novo_roi <= 50:
+            st.info("🔍 ROI razoável. Adoção pode ser **viável com ajustes estratégicos** e acompanhamento inicial.")
         else:
-            st.warning("Apesar do ROI abaixo, você aceita riscos. Pode valer a pena, mas com estratégia de controle de danos.")
+            st.warning("⚠️ ROI baixo. **Reavalie os custos ou estimativas de receita** antes de investir.")
 
-    st.markdown("---")
-    st.subheader("💡 Recomendações Técnicas Finais")
+        st.markdown("---")
+        st.subheader("💡 Possíveis Ações Estratégicas Futuras")
 
-    st.markdown("""
-    - Automatizar o monitoramento dos dados em tempo real para ajustar as vendas.
-    - Investir em modelos preditivos baseados em **inteligência artificial** para refinar a previsão de demanda.
-    - Buscar **subsídios ou parcerias** que ajudem a reduzir os custos operacionais.
-    - Reavaliar anualmente a performance do sistema e seu ROI real.
-    """)
+        st.markdown("""
+        - **Reduzir custos operacionais** com renegociação de fornecedores.
+        - **Melhorar o algoritmo de previsão** com mais dados históricos e fontes externas (como eventos e clima).
+        - **Testar o sistema em voos piloto** antes de escalá-lo totalmente.
+        - **Oferecer políticas mais flexíveis de remarcação** para reduzir impacto de overbooking.
+
+        > Uma abordagem cautelosa, porém inovadora, pode gerar um diferencial competitivo de longo prazo.
+        """)
