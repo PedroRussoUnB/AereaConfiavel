@@ -144,36 +144,48 @@ with aba2:
 with aba3:
     st.header("Decisão Estratégica Final")
 
-    # Verificar se o ROI foi calculado
     roi_percent = st.session_state.get("roi_percent", None)
 
     if roi_percent is None:
-        st.warning("⚠️ O ROI ainda não foi calculado. Volte para a aba anterior, forneça os dados e clique em Simular ROI.")
+        st.warning("⚠️ O ROI ainda não foi calculado. Volte para a aba anterior e forneça os dados.")
     else:
         st.success(f"✅ ROI calculado com os dados fornecidos: **{roi_percent:.2f}%**")
 
-        st.markdown("### ✏️ Personalize sua análise")
+        st.markdown("### 🎯 Defina o ROI que você considera satisfatório")
+        roi_esperado = st.slider("ROI desejado (%)", min_value=0.0, max_value=300.0, value=25.0, step=0.5)
 
-        preferencia = st.radio("Com base nesse ROI, você recomendaria:", 
-                               ["Sim, adotar imediatamente o sistema.",
-                                "Não, somente com ajustes nos custos ou metas de receita.",
-                                "Não é vantajoso neste momento."])
+        # Cálculo da diferença percentual
+        diferenca = roi_percent - roi_esperado
+        proporcao = diferenca / roi_esperado if roi_esperado != 0 else 0
 
-        st.markdown("### 💬 Comentários Técnicos")
-        comentario_tec = st.text_area("Digite sua análise técnica:", 
-                                      placeholder="Ex: O sistema mostrou ROI positivo mesmo em cenários conservadores, o que demonstra robustez...")
-
-        st.markdown("### 💬 Comentários Financeiros")
-        comentario_fin = st.text_area("Digite sua análise financeira:", 
-                                      placeholder="Ex: Com custo inicial de R$ 50.000 e ROI superior a 20%, o investimento é viável...")
-
-        st.markdown("### 💡 Evolução sugerida para o sistema de informação")
-        sugestoes = st.text_area("Como o sistema pode melhorar no futuro?", 
-                                 placeholder="Ex: Adicionar inteligência artificial, usar dados climáticos, ajustar em tempo real as vendas...")
+        # Gerar comentários automáticos com base na diferença proporcional
+        if proporcao >= 0.5:
+            comentario = (
+                f"O ROI obtido ({roi_percent:.2f}%) está significativamente acima do desejado ({roi_esperado:.2f}%). "
+                "Isso demonstra excelente desempenho do sistema, indicando forte viabilidade financeira. "
+                "A empresa pode considerar expandir o investimento, testar novas rotas com maior flexibilidade e investir em IA para refinar as previsões de demanda."
+            )
+        elif proporcao >= 0.1:
+            comentario = (
+                f"O ROI obtido ({roi_percent:.2f}%) está acima do ROI esperado ({roi_esperado:.2f}%), "
+                "o que é um indicativo saudável de retorno. A adoção do sistema é recomendada, e ajustes finos, como melhorias em coleta de dados e redução de custos operacionais, podem aumentar ainda mais o desempenho."
+            )
+        elif -0.1 <= proporcao < 0.1:
+            comentario = (
+                f"O ROI calculado ({roi_percent:.2f}%) está próximo ou igual ao ROI esperado ({roi_esperado:.2f}%), "
+                "o que mostra que o sistema atende às expectativas. A decisão pode ser pela adoção com monitoramento contínuo e controle de riscos, principalmente quanto à sazonalidade da demanda."
+            )
+        elif -0.3 <= proporcao < -0.1:
+            comentario = (
+                f"O ROI calculado ({roi_percent:.2f}%) está moderadamente abaixo do ROI esperado ({roi_esperado:.2f}%). "
+                "Isso exige cautela: ajustes nos custos operacionais ou maior segmentação de marketing podem ser necessários para atingir o retorno desejado."
+            )
+        else:
+            comentario = (
+                f"O ROI calculado ({roi_percent:.2f}%) está bem abaixo do ROI desejado ({roi_esperado:.2f}%). "
+                "A adoção do sistema não é recomendada neste momento. Sugere-se revisar o modelo de previsão, reduzir despesas ou buscar parcerias estratégicas para viabilizar o investimento."
+            )
 
         st.markdown("---")
-        st.subheader("📌 Resumo da Sua Recomendação:")
-        st.write(f"- **Recomendação:** {preferencia}")
-        st.write(f"- **Comentário Técnico:** {comentario_tec}")
-        st.write(f"- **Comentário Financeiro:** {comentario_fin}")
-        st.write(f"- **Sugestões de Evolução:** {sugestoes}")
+        st.subheader("📌 Recomendação Gerada Automaticamente:")
+        st.info(comentario)
