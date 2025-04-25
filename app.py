@@ -34,7 +34,7 @@ with col1:
     st.image(logo_unb, use_container_width=True)
 with col2:
     st.markdown("<h1 style='text-align: center; color: #003366;'>Análise de Distribuições de Probabilidade</h1>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align: center; color: #003366;'>Pedro Richetti Russo</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; color: #003366;'>Pedro Richetti Russo e Daniel Vianna</h3>", unsafe_allow_html=True)
 with col3:
     st.image(logo_unb, use_container_width=True)
 
@@ -136,11 +136,12 @@ with aba2:
     st.write(f"- Realista (média): {np.mean(rois_simulados):.2f}%")
     st.write(f"- Pessimista (percentil 10): {np.percentile(rois_simulados, 10):.2f}%")
 
+
 # -------------------------- ABA 3 - DECISÃO FINAL --------------------------
 with aba3:
     st.header("Decisão Estratégica Final")
 
-    # Recuperar ROI salvo da aba anterior
+    # Verificar se o ROI foi calculado
     roi_percent = st.session_state.get("roi_percent", None)
 
     if roi_percent is None:
@@ -148,39 +149,28 @@ with aba3:
     else:
         st.success(f"✅ ROI calculado com os dados fornecidos: **{roi_percent:.2f}%**")
 
-        st.markdown("---")
-        st.subheader("📌 Análise Estratégica Interativa")
+        st.markdown("### ✏️ Personalize sua análise")
 
-        st.markdown("Com base no ROI atual, você pode ajustar as variáveis abaixo para simular diferentes estratégias:")
+        preferencia = st.radio("Com base nesse ROI, você recomendaria:", 
+                               ["Sim, adotar imediatamente o sistema.",
+                                "Não, somente com ajustes nos custos ou metas de receita.",
+                                "Não é vantajoso neste momento."])
 
-        # Ajustes estratégicos
-        nova_receita = st.slider("Nova Receita Esperada (R$)", min_value=40000, max_value=120000, value=80000, step=5000)
-        novo_custo_operacional = st.slider("Novo Custo Operacional (R$)", min_value=0, max_value=30000, value=10000, step=1000)
-        novo_custo_investimento = st.slider("Novo Custo de Investimento (R$)", min_value=30000, max_value=70000, value=50000, step=5000)
+        st.markdown("### 💬 Comentários Técnicos")
+        comentario_tec = st.text_area("Digite sua análise técnica:", 
+                                      placeholder="Ex: O sistema mostrou ROI positivo mesmo em cenários conservadores, o que demonstra robustez...")
 
-        lucro = nova_receita - novo_custo_operacional
-        novo_roi = (lucro / novo_custo_investimento) * 100
+        st.markdown("### 💬 Comentários Financeiros")
+        comentario_fin = st.text_area("Digite sua análise financeira:", 
+                                      placeholder="Ex: Com custo inicial de R$ 50.000 e ROI superior a 20%, o investimento é viável...")
 
-        st.markdown(f"💰 **Novo ROI Simulado:** `{novo_roi:.2f}%`")
-
-        st.markdown("---")
-        st.subheader("📈 Recomendação Baseada no Novo ROI")
-
-        if novo_roi > 50:
-            st.success("🚀 Excelente ROI! A recomendação é **adotar imediatamente o sistema**, com grande chance de retorno financeiro.")
-        elif 20 <= novo_roi <= 50:
-            st.info("🔍 ROI razoável. Adoção pode ser **viável com ajustes estratégicos** e acompanhamento inicial.")
-        else:
-            st.warning("⚠️ ROI baixo. **Reavalie os custos ou estimativas de receita** antes de investir.")
+        st.markdown("### 💡 Evolução sugerida para o sistema de informação")
+        sugestoes = st.text_area("Como o sistema pode melhorar no futuro?", 
+                                 placeholder="Ex: Adicionar inteligência artificial, usar dados climáticos, ajustar em tempo real as vendas...")
 
         st.markdown("---")
-        st.subheader("💡 Possíveis Ações Estratégicas Futuras")
-
-        st.markdown("""
-        - **Reduzir custos operacionais** com renegociação de fornecedores.
-        - **Melhorar o algoritmo de previsão** com mais dados históricos e fontes externas (como eventos e clima).
-        - **Testar o sistema em voos piloto** antes de escalá-lo totalmente.
-        - **Oferecer políticas mais flexíveis de remarcação** para reduzir impacto de overbooking.
-
-        > Uma abordagem cautelosa, porém inovadora, pode gerar um diferencial competitivo de longo prazo.
-        """)
+        st.subheader("📌 Resumo da Sua Recomendação:")
+        st.write(f"- **Recomendação:** {preferencia}")
+        st.write(f"- **Comentário Técnico:** {comentario_tec}")
+        st.write(f"- **Comentário Financeiro:** {comentario_fin}")
+        st.write(f"- **Sugestões de Evolução:** {sugestoes}")
