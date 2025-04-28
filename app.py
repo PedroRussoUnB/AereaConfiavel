@@ -154,43 +154,42 @@ with aba3:
         st.markdown("### 🎯 Defina o ROI que você considera satisfatório para o investimento")
         roi_esperado = st.slider("ROI desejado (%)", min_value=50.0, max_value=300.0, value=100.0, step=0.5)
 
-        # Cálculo da diferença proporcional com segurança
         diferenca = roi_percent - roi_esperado
         proporcao = diferenca / roi_esperado if roi_esperado != 0 else 0
 
-        # Comentários técnicos-financeiros com base na performance do ROI
+        # Comentários realistas e técnicos
         if proporcao >= 0.5:
             comentario = (
-                f"O ROI obtido ({roi_percent:.2f}%) está **muito acima** do desejado ({roi_esperado:.2f}%).\n\n"
-                "💰 **Comentário Financeiro:** O investimento demonstra retorno excepcional. Recomenda-se considerar a expansão do uso do sistema em outras rotas e, se possível, renegociar custos fixos para manter a alta margem de lucro.\n\n"
-                "🧠 **Comentário Técnico:** O sistema se mostrou robusto e eficaz. Seria estratégico incorporar inteligência artificial para prever sazonalidades e integrar dados de clima e eventos para refinar ainda mais as estimativas."
+                f"O ROI obtido ({roi_percent:.2f}%) está **muito acima** do ROI esperado ({roi_esperado:.2f}%).\n\n"
+                "💰 **Comentário Financeiro:** O sistema gerou resultados excepcionais, indicando excelente gestão de custos e alta eficiência na previsão de demanda. É recomendável reinvestir parte do lucro em expansão ou inovação tecnológica.\n\n"
+                "🧠 **Comentário Técnico:** A acurácia do modelo de previsão é elevada. Para evoluir ainda mais, pode-se incorporar dados externos como sazonalidade e eventos regionais, além de algoritmos de machine learning para ajustes dinâmicos."
             )
         elif proporcao >= 0.05:
             comentario = (
-                f"O ROI obtido ({roi_percent:.2f}%) está **acima** do esperado ({roi_esperado:.2f}%), o que indica um bom retorno.\n\n"
-                "💰 **Comentário Financeiro:** O sistema apresenta desempenho satisfatório. A empresa pode focar em manter o controle de custos e utilizar os ganhos para melhorias contínuas.\n\n"
-                "🧠 **Comentário Técnico:** Recomendado monitoramento contínuo da performance. Adições como algoritmos de aprendizado de máquina e melhoria da coleta de dados em tempo real trariam ainda mais precisão ao sistema."
+                f"O ROI obtido ({roi_percent:.2f}%) está **acima** do ROI esperado ({roi_esperado:.2f}%).\n\n"
+                "💰 **Comentário Financeiro:** O retorno é satisfatório e confirma a viabilidade do investimento. A recomendação é manter a estratégia atual e considerar margens de segurança para eventuais variações de mercado.\n\n"
+                "🧠 **Comentário Técnico:** Para maximizar resultados, é interessante realizar ajustes finos nas variáveis do sistema e promover atualizações periódicas com novos dados de comportamento de passageiros."
             )
         elif -0.05 <= proporcao < 0.05:
             comentario = (
-                f"O ROI calculado ({roi_percent:.2f}%) está **próximo ou igual** ao ROI desejado ({roi_esperado:.2f}%).\n\n"
-                "💰 **Comentário Financeiro:** O retorno é aceitável, mas requer atenção à eficiência de custos e eventuais mudanças de mercado.\n\n"
-                "🧠 **Comentário Técnico:** É recomendável realizar testes A/B com diferentes modelos de previsão para aumentar a assertividade e, assim, elevar os retornos futuros."
+                f"O ROI calculado ({roi_percent:.2f}%) está **próximo ou igual** ao ROI esperado ({roi_esperado:.2f}%).\n\n"
+                "💰 **Comentário Financeiro:** Embora o retorno seja coerente com o objetivo, ele é sensível a pequenas mudanças de mercado. Recomenda-se acompanhar de perto os custos operacionais e otimizar processos para ampliar a margem.\n\n"
+                "🧠 **Comentário Técnico:** O sistema é funcional, mas pode se beneficiar de melhorias em fontes de dados e algoritmos de previsão para aumentar a robustez frente a cenários inesperados."
             )
         elif -0.3 <= proporcao < -0.05:
             comentario = (
-                f"O ROI calculado ({roi_percent:.2f}%) está **abaixo** do esperado ({roi_esperado:.2f}%).\n\n"
-                "💰 **Comentário Financeiro:** Risco de retorno insatisfatório. Avalie renegociar o custo do sistema ou adiar o investimento até ajustes mais precisos.\n\n"
-                "🧠 **Comentário Técnico:** O sistema pode estar subestimando variações de demanda. Sugere-se incorporar mais dados históricos e revisar os parâmetros de simulação."
+                f"O ROI calculado ({roi_percent:.2f}%) está **abaixo** do ROI esperado ({roi_esperado:.2f}%).\n\n"
+                "💰 **Comentário Financeiro:** Há risco de o investimento não alcançar o retorno planejado. Alternativas como renegociar o custo de implementação ou buscar subsídios podem ser consideradas.\n\n"
+                "🧠 **Comentário Técnico:** O sistema pode estar superestimando a demanda ou subestimando custos. Ajustar as premissas de simulação e incorporar mais variáveis exógenas pode corrigir essas distorções."
             )
         else:
             comentario = (
-                f"O ROI calculado ({roi_percent:.2f}%) está **muito abaixo** do ROI desejado ({roi_esperado:.2f}%).\n\n"
-                "💰 **Comentário Financeiro:** A adoção imediata não é recomendada. Com esse desempenho, o retorno não justifica o investimento inicial.\n\n"
-                "🧠 **Comentário Técnico:** É essencial revisar completamente a lógica do sistema de previsão. Avalie ferramentas mais sofisticadas, integração com fontes externas e uma abordagem mais granular da demanda."
+                f"O ROI calculado ({roi_percent:.2f}%) está **muito abaixo** do ROI esperado ({roi_esperado:.2f}%).\n\n"
+                "💰 **Comentário Financeiro:** Nesse cenário, o investimento não se justifica sem ajustes substanciais. É recomendado reavaliar a continuidade do projeto ou repensar a estratégia de adoção.\n\n"
+                "🧠 **Comentário Técnico:** Uma revisão completa do sistema é necessária. A integração de dados em tempo real, uso de IA preditiva e segmentação de passageiros podem ser caminhos para viabilizar resultados futuros melhores."
             )
 
         # Exibição final
         st.markdown("---")
-        st.subheader("📌 Análise Estratégica Gerada Automáticamente:")
+        st.subheader("📌 Análise Estratégica:")
         st.info(comentario)
